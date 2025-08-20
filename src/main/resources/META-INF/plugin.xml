@@ -1,0 +1,36 @@
+<!-- Copyright 2000-2023 JetBrains s.r.o. and other contributors. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file. -->
+<!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
+
+<idea-plugin>
+  <id>io.github.projecthsf.go.playground</id>
+  <name>Go Playground</name>
+
+  <version>1.0.0</version>
+  <vendor email="w2ajax@gmail.com" url="https://github.com/projecthsf/go-playground">Jin Nguyen</vendor>
+
+  <depends>com.intellij.modules.platform</depends>
+  <depends>com.intellij.modules.goland</depends>
+  <depends>org.jetbrains.plugins.go</depends>
+
+  <description>
+    <![CDATA[
+      Add a box Go playground that you can play with Go without touch to your current "func main()"
+      <ul>
+       <li>Playground with GO</li>
+       <li>Suport syntax highlight</li>
+       <li>Can choose go version to execute</li>
+      </ul>
+    ]]>
+  </description>
+  <change-notes>
+    <![CDATA[
+      <ul>
+        <li><b>1.0.0</b> First launch</li>
+      </ul>
+    ]]>
+  </change-notes>
+  <extensions defaultExtensionNs="com.intellij">
+    <toolWindow id="GoPlayground" secondary="true" icon="AllIcons.Language.GO" anchor="right"
+                factoryClass="io.github.projecthsf.go.playground.toolWindow.GoPlaygroundWindowFactory"/>
+  </extensions>
+</idea-plugin>
