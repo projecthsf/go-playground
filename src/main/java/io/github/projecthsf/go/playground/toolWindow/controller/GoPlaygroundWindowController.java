@@ -27,11 +27,14 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GoPlaygroundWindowController extends JBPanel {
     @NotNull ToolWindow toolWindow;
     GoPlaygroundWindowForm form = new GoPlaygroundWindowForm();
     ComboBox<String> versions = new ComboBox<>();
+    Map<String, GoSdk> sdkMap = new HashMap<>();
     public GoPlaygroundWindowController(@NotNull ToolWindow toolWindow) {
         form.addListener(toolWindow.getProject());
         this.toolWindow = toolWindow;
@@ -74,6 +77,7 @@ public class GoPlaygroundWindowController extends JBPanel {
 
         VirtualFile goSdk = sdks.iterator().next();
         versions.removeAllItems();
+        sdkMap = new HashMap<>();
         GoSdkList.getInstance().reloadSdks(toolWindow.getProject(), (consumers) -> {
             for (GoSdk sdk: consumers) {
                 versions.addItem(sdk.getVersion());
@@ -81,6 +85,8 @@ public class GoPlaygroundWindowController extends JBPanel {
                 if (sdk.getSdkRoot() == null) {
                     continue;
                 }
+
+                sdkMap.put(sdk.getVersion(), sdk);
 
                 if (goSdk.getPath().equals(sdk.getSdkRoot().getPath() + "/bin")) {
                     versions.setSelectedItem(sdk.getVersion());
@@ -110,13 +116,16 @@ public class GoPlaygroundWindowController extends JBPanel {
                 return;
             }
 
+            String goVersion = (String) controller.versions.getSelectedItem();
+            GoSdk goSdk = controller.sdkMap.get(goVersion);
+
             Runnable run = () -> {
                 PsiDirectory directory = PsiManager.getInstance(controller.toolWindow.getProject()).findDirectory(goRoot);
                 deletePlaygroundFileIfExisted(goRoot);
 
                 PsiFile file = PsiFileFactory.getInstance(controller.toolWindow.getProject()).createFileFromText(PlainTextLanguage.INSTANCE, controller.form.getGoPlaygroundCode());
                 directory.copyFileFrom(FILE_NAME, file);
-                ExecuteUtil.execute(controller.toolWindow.getProject(), String.format("%s/go%s/bin/go run %s/%s",  goRoot.getPath(), controller.versions.getSelectedItem(), goRoot.getPath(), FILE_NAME), "Playground");
+                ExecuteUtil.execute(controller.toolWindow.getProject(), String.format("%s run %s/%s",  goSdk.getExecutable().getPath(), goRoot.getPath(), FILE_NAME), "Playground");
             };
 
             ApplicationManager.getApplication().runWriteAction(run);
@@ -133,7 +142,7 @@ public class GoPlaygroundWindowController extends JBPanel {
             try {
                 playgroundFile.delete(null);
             } catch (Exception e) {
-                System.out.printf("=========== delete file: %s failed: %s", playgroundFile.getName(), e.getMessage());
+                
             }
         }
     }
