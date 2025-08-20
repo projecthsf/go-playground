@@ -14,7 +14,7 @@
 
   <description>
     <![CDATA[
-      Add a box Go playground that you can play with Go without touch to your current "func main()"
+      Add Go playground to IDE that you can play with Go without touch to project files
       <ul>
        <li>Playground with GO</li>
        <li>Suport syntax highlight</li>
